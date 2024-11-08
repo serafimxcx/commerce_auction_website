@@ -1,0 +1,51 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+    <br>
+    {% for item in items %}  
+    <br>
+    
+    <a href="{% url 'item' item.name %}">
+        <div class="item_container">
+            <div class="row">
+                <div class="col-lg-3 img_col">
+                    <div class="img_container"><img src="media/{{ item.image }}" alt="" class="item_img"></div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-auto">
+                            <h3> {{ item.name }}</h3>
+                        </div>
+                        <div class="col-auto">
+                            {% if not item.isOpen %}
+                
+                                <input type="button" class="btn btn-danger btn_close" value="Closed" disabled>
+        
+                            {% endif %}
+                        </div>
+
+                    </div>
+                    
+                    
+                    <h5>{{ item.category }} <span class='bullet'>&#8226;</span> 
+                        {% if item.bid_set.all %}
+                            ₱ {{ item.latest_bid|floatformat:"2" }}
+                        {% else %}
+                            ₱ {{ item.price }}
+                        {% endif %}
+                    </h5><br>
+                    <p>{{ item.description }}</p>
+                    <span>Created {{ item.date }}, {{ item.time }}</span>
+                </div>
+
+            </div>
+        </div> 
+    </a>
+
+    {% empty %}
+    <div>Nothing to see here.</div>   
+
+    {% endfor %}
+    
+{% endblock %}

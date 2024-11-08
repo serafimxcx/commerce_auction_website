@@ -1,0 +1,37 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Watchlist</h2>
+    <br>
+    {% for list in watchlist %}  
+    <br>
+    <a href="{% url 'item' list.item.name %}">
+        <div class="item_container">
+            <table>
+                <tr>
+                    <td>
+                        <form action="{% url 'remove_watchlist' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="txt_watchlist_id" value="{{ list.id }}">
+                            <button type="submit" class="btn btn-danger btn_remove" title="Remove from Watchlist">X</button>
+                        </form>
+                        
+                    </td>
+                    <td><div class="img_container"><img src="media/{{ list.item.image }}" alt="" class="item_img"></div></td>
+                    <td>
+                        <h3> {{ list.item.name }}</h3>
+                        <h5>{{ list.item.category }} <span class='bullet'>&#8226;</span> ₱ {{ list.item.price }}</h5><br>
+                        <p>{{ list.item.description }}</p>
+                        <span>Created {{ list.item.date }}, {{ list.item.time }}</span>
+                    </td>
+                </tr>
+            </table>
+            
+        </div> 
+    </a>
+
+    {% empty %}
+    <div>Nothing to see here.</div>   
+
+    {% endfor %}
+{% endblock %}

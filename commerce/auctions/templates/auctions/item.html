@@ -1,0 +1,178 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% for item in items %}
+    <div class="list_container">
+        {% if not item.isOpen %}
+        <span>
+            The bidding for this item is already closed.
+
+            {% if not item.isOpen %}
+                {% if is_current_bid %}
+                    <b>You won in this bidding.</b>
+                {% endif %}
+            {% endif %}
+
+        </span> 
+        <br><br>
+        {% endif %}
+        <div class="row">
+            <div class="col-lg-3 img_col">
+                <div class="img_container"><img src="/media/{{ item.image }}" alt="" class="item_img2"></div>
+            </div>
+            <div class="col-lg-9">
+                <h1>
+                <table>
+                    <tr>
+                        <td style="vertical-align: bottom;">{{item.name}}</td>
+                        {% if item.author == user %}
+                            <td style="vertical-align: bottom;">
+                                {% if item.isOpen %}
+                                <form action="{% url 'close_bidding' item.name %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="txt_item" value="{{ item.id }}">
+                                    <input type="submit" class="btn btn-warning btn_item" value="Close">
+                                </form>
+        
+                                {% endif %}
+        
+        
+        
+                            
+                                
+                            </td>
+                        
+                            {% else %}
+                            <td style="vertical-align: bottom;">
+                                {% if watchlist_entry %}
+                                <a href="{% url 'watchlist' %}"><button type="button" class="btn btn-success btn_item" title="Go to Watchlist"><i class="bi bi-check-lg"></i> Added to Watchlist</button></a>
+                            
+                                {% else %}
+                                <form action="{% url 'add_watchlist' item.name %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="txt_item" value="{{ item.id }}">
+                                    <button type="submit" class="btn btn-primary btn_item" >Add to Watchlist</button>
+                                </form>
+                                {% endif %}
+                            </td>
+        
+                        {% endif %}
+                        
+                    </tr>
+                </table>
+                </h1>
+
+                <ul>
+                    <li>Listed by : {{ item.author }}</li>
+                    <li>Category : {{ item.category }}</li>
+                </ul>
+
+                <p>{{item.description}}</p><br>
+
+                <h5>Original Price: ₱ {{ item.price }}</h5>
+                {% if item_price == 0 %}
+                    <h5>Current Bid: None</h5>
+
+                    {% else %}
+                    <h5>Current Bid: ₱ {{ item_price }}</h5>
+
+                {% endif %}
+                
+            </div>
+
+        </div>
+
+        <br>
+        <p>{{bid_count}} bid(s) so far.
+
+            {% if is_current_bid %}
+                Your bid is the current bid. 
+            {% endif %}
+
+        </p>
+
+        {% if item.author == user or not item.isOpen %}
+            <ol>
+                {% for bidder in bidders %}
+                <li>{{ bidder.user }} - ₱ {{ bidder.bid }}
+
+                    {% if bidder.user == user %}
+                        ( You )
+                    {% endif %}
+
+                </li>
+
+                {% endfor %}
+
+            </ol>
+            
+        {% else %}
+        <form action="{% url 'add_bid' item.name %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="txt_item" value="{{ item.id }}">
+            {% if item_price == 0 %}
+            <input type="hidden" name="txt_price" value="{{ item.price }}">
+
+            {% else %}
+            <input type="hidden" name="txt_price" value="{{ item_price }}">
+
+            {% endif %}
+            
+            <input type="text" class="form-control" name="txt_bid" id="txt_bid" placeholder="Bid" required><br>
+
+            {% if messages %}
+                {% for message in messages%}
+                    <h5>{{message}}</h5>
+                {% endfor %}
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Place Bid</button>
+        </form>
+        <br>
+        
+        {% endif %}
+
+        
+
+        
+        <br><hr><br>
+        <h3>Comments</h3>
+        <div>
+            <form action="{% url 'add_comment' item.name %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="txt_item" value="{{ item.id }}">
+                <textarea name="txt_comment" class="form-control" id="" placeholder="Tell us something about this item."></textarea><br>
+                <input type="submit" class="btn btn-primary" value="Post">
+            </form>
+            
+            <br>
+            <div>
+                {% for comment in comments %}
+                <table>
+                    <tr>
+                        <td style="vertical-align: top;"><h5>{{comment.user}} - <span >{{comment.datetime}}</span></h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><p>{{comment.content}}</p></td>
+                    </tr>
+                </table>
+                
+                
+                
+                <hr>
+
+                {% empty %}
+                There are no comments posted at this moment.
+
+                {% endfor %}
+            </div>
+        </div>
+        <br><br>
+        
+    {% endfor %}
+    </div>
+        
+        
+        
+{% endblock %}

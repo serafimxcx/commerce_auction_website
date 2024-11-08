@@ -1,0 +1,97 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Create Listing</h2>
+    <br>
+    <div class="row">
+        <div class="col-lg-6">
+            <form action="{% url 'create' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <td><label for="slct_category">Category: &nbsp;</label></td>
+                        <td><select name="slct_category" class="form-control" id="slct_category">
+                            <option value="">Select...</option>
+                            {% for category in categories %}
+                                <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select></td>
+                    </tr>
+                    <tr>
+                        <td><label for="txt_name">Name: &nbsp;</label></td>
+                        <td><input type="text" class="form-control" name="txt_name" id="txt_name" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="txt_price">Price: &nbsp;</label></td>
+                        <td><input type="text" class="form-control" name="txt_price" id="txt_price" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="txt_desc">Description: &nbsp;</label></td>
+                        <td><textarea class="form-control" name="txt_desc" id="txt_desc" cols="30" rows="3" required></textarea></td>
+                    </tr>
+                    <tr>
+                        <td><label for="upload_image">Upload Image: &nbsp;</label></td>
+                        <td><label for="file-upload" class="custom-file-upload">
+                            <input id="file-upload" name="upload_image" type="file" required>
+                            Choose File
+                        </label> &nbsp; <span id="file-name-output"></span>
+                        </td>
+                    </tr>
+                </table>
+                <br><br>
+                <input type="submit" class="btn btn-success" value="Add to Auction">
+            </form>
+                <br>
+                {% if message %}
+                    <span>{{ message }}</span>
+                {% endif %}
+
+        </div>
+        <div class="col-lg-6 display_items">
+            <table width="100%" class="table_items">
+                <tr>
+                    <th>Category</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Bid Count</th>
+                    <th></th>
+                </tr>
+                {% for item in items %}
+                    
+                    <tr>
+                        <td>{{item.category}}</td>
+                        <td>{{item.name}}</td>
+                        <td>
+                            {% if item.bid_set.all %}
+                                ₱ {{ item.latest_bid|floatformat:"2" }}
+                            {% else %}
+                                ₱ {{ item.price }}
+                            {% endif %}
+
+                        </td>
+                        <td>
+                            {{ item.bid_set.count }}
+                        </td>
+                        <td style="text-align: center;"><a href="{% url 'item' item.name %}"><input type="button" class="btn btn-primary" value="View"></a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    
+
+
+    <script>
+        $(document).ready(function() {
+            $('#file-upload').change(function() {
+                var file = $(this)[0].files[0];
+                
+                if (file) {
+                    $('#file-name-output').text('Selected file: ' + file.name);
+                } else {
+                    $('#file-name-output').text('');
+                }
+            });
+        });
+    </script> 
+{% endblock %}
